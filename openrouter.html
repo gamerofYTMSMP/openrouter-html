@@ -1,0 +1,2417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mind Mate AI</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #10a37f;
+            --primary-dark: #0d8f6f;
+            --secondary: #6366f1;
+            --success: #19c37d;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --radius: 8px;
+            --radius-lg: 12px;
+            --transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        /* Dark theme (default) */
+        [data-theme="dark"], :root {
+            --background: #212121;
+            --surface: #2f2f2f;
+            --surface-light: #404040;
+            --surface-lighter: #525252;
+            --text-primary: #ececec;
+            --text-secondary: #c5c5c5;
+            --text-muted: #8e8ea0;
+            --border: #444654;
+            --border-light: #565869;
+            --overlay: rgba(0, 0, 0, 0.7);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Light theme */
+        [data-theme="light"] {
+            --background: #ffffff;
+            --surface: #f8f9fa;
+            --surface-light: #e9ecef;
+            --surface-lighter: #dee2e6;
+            --text-primary: #212529;
+            --text-secondary: #495057;
+            --text-muted: #6c757d;
+            --border: #dee2e6;
+            --border-light: #ced4da;
+            --overlay: rgba(255, 255, 255, 0.9);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* System theme - uses CSS media query */
+        @media (prefers-color-scheme: light) {
+            [data-theme="system"] {
+                --background: #ffffff;
+                --surface: #f8f9fa;
+                --surface-light: #e9ecef;
+                --surface-lighter: #dee2e6;
+                --text-primary: #212529;
+                --text-secondary: #495057;
+                --text-muted: #6c757d;
+                --border: #dee2e6;
+                --border-light: #ced4da;
+                --overlay: rgba(255, 255, 255, 0.9);
+                --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+                --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            }
+        }
+
+        @media (prefers-color-scheme: dark) {
+            [data-theme="system"] {
+                --background: #212121;
+                --surface: #2f2f2f;
+                --surface-light: #404040;
+                --surface-lighter: #525252;
+                --text-primary: #ececec;
+                --text-secondary: #c5c5c5;
+                --text-muted: #8e8ea0;
+                --border: #444654;
+                --border-light: #565869;
+                --overlay: rgba(0, 0, 0, 0.7);
+                --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow: hidden;
+        }
+
+        /* Auth Screen Styles */
+        .auth-container {
+            width: 100vw;
+            height: 100vh;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .auth-content {
+            width: 375px;
+            height: 812px;
+            background: white;
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .app-title {
+            position: absolute;
+            left: 127px;
+            top: 108px;
+            text-align: center;
+            color: black;
+            font-size: 24px;
+            font-family: Inter;
+            font-weight: 600;
+            line-height: 36px;
+        }
+
+        .content-wrapper {
+            padding: 0 24px;
+            position: absolute;
+            left: 0;
+            top: 250.5px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .copy-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .copy-section h2 {
+            text-align: center;
+            color: black;
+            font-size: 16px;
+            font-family: Inter;
+            font-weight: 600;
+            line-height: 24px;
+            margin: 0;
+        }
+
+        .copy-section p {
+            text-align: center;
+            color: black;
+            font-size: 14px;
+            font-family: Inter;
+            font-weight: 400;
+            line-height: 21px;
+            margin: 0;
+        }
+
+        .input-button-section {
+            width: 327px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .input-field {
+            height: 40px;
+            padding: 8px 16px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #E0E0E0;
+            color: black;
+            font-size: 14px;
+            font-family: Inter;
+            font-weight: 400;
+            line-height: 19.6px;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .input-field:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(16, 163, 127, 0.1);
+        }
+
+        .input-field::placeholder {
+            color: #828282;
+        }
+
+        .continue-btn {
+            height: 40px;
+            padding: 0 16px;
+            background: black;
+            border-radius: 8px;
+            border: none;
+            color: white;
+            font-size: 14px;
+            font-family: Inter;
+            font-weight: 500;
+            line-height: 19.6px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .continue-btn:hover {
+            background: #333;
+            transform: translateY(-1px);
+        }
+
+        .continue-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .divider {
+            width: 327px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .divider-line {
+            flex: 1;
+            height: 1px;
+            background: #E6E6E6;
+        }
+
+        .divider-text {
+            text-align: center;
+            color: #828282;
+            font-size: 14px;
+            font-family: Inter;
+            font-weight: 400;
+            line-height: 19.6px;
+        }
+
+        .google-btn {
+            width: 327px;
+            height: 40px;
+            background: #EEEEEE;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: relative;
+        }
+
+        .google-btn:hover {
+            background: #e0e0e0;
+            transform: translateY(-1px);
+        }
+
+        .google-btn-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .google-btn-text {
+            color: black;
+            font-size: 14px;
+            font-family: Inter;
+            font-weight: 500;
+            line-height: 19.6px;
+        }
+
+        .welcome-text {
+            text-align: center;
+            color: #828282;
+            font-size: 12px;
+            font-family: Inter;
+            font-weight: 400;
+            line-height: 18px;
+            width: 327px;
+        }
+
+        .forgot-password-link {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 12px;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 8px;
+        }
+
+        /* Password Reset Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--radius-lg);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-title {
+            color: black;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .modal-description {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-input {
+            width: 100%;
+            height: 40px;
+            padding: 8px 16px;
+            border: 1px solid #E0E0E0;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            outline: none;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .modal-btn.primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .modal-btn.secondary {
+            background: #f0f0f0;
+            color: black;
+        }
+
+        /* Profile Modal */
+        .profile-modal .modal-content {
+            max-width: 500px;
+            text-align: left;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 600;
+            color: white;
+            background: var(--primary);
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .profile-info h3 {
+            color: black;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-info p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .profile-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-section h4 {
+            color: black;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-detail {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .profile-detail:last-child {
+            border-bottom: none;
+        }
+
+        .profile-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .profile-value {
+            color: black;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .change-password-btn {
+            background: var(--warning);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: var(--transition);
+        }
+
+        .change-password-btn:hover {
+            background: #e67e22;
+        }
+
+        /* Chat Interface (Hidden initially) */
+        .chat-container {
+            display: none;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: var(--surface-light);
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .user-info:hover {
+            background: var(--surface-lighter);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-email {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .profile-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .profile-btn:hover {
+            background: var(--surface-lighter);
+            color: var(--text-primary);
+        }
+
+        .new-chat-btn {
+            width: 100%;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        .new-chat-btn:hover {
+            background: var(--surface-light);
+            border-color: var(--border-light);
+        }
+
+        .model-section, .settings-section {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .model-selector select {
+            width: 100%;
+            background: var(--background);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 0.75rem;
+            border-radius: var(--radius);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .model-selector select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .model-info {
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background: var(--surface-light);
+            border-radius: var(--radius);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .model-price {
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .setting-item {
+            margin-bottom: 1rem;
+        }
+
+        .setting-item label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .setting-item input[type="range"] {
+            width: 100%;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        .setting-item input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--primary);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .setting-item input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+
+        .number-input {
+            width: 100%;
+            background: var(--background);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 0.5rem;
+            border-radius: var(--radius);
+            font-size: 0.85rem;
+        }
+
+        .number-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 1rem;
+        }
+
+        .logout-btn {
+            width: 100%;
+            background: var(--error);
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            justify-content: center;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+        }
+
+        .main-chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: var(--background);
+        }
+
+        .chat-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: var(--surface);
+            justify-content: space-between;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .theme-selector {
+            position: relative;
+        }
+
+        .theme-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .theme-btn:hover {
+            background: var(--surface-light);
+            color: var(--text-primary);
+            border-color: var(--border-light);
+        }
+
+        .theme-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 0.5rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            min-width: 120px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: var(--transition);
+            z-index: 1000;
+        }
+
+        .theme-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .theme-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .theme-option:first-child {
+            border-radius: var(--radius) var(--radius) 0 0;
+        }
+
+        .theme-option:last-child {
+            border-radius: 0 0 var(--radius) var(--radius);
+        }
+
+        .theme-option:hover {
+            background: var(--surface-light);
+            color: var(--text-primary);
+        }
+
+        .theme-option.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .theme-option i {
+            width: 16px;
+            text-align: center;
+        }
+
+        .sidebar-toggle {
+            display: none;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: var(--radius);
+            transition: var(--transition);
+        }
+
+        .sidebar-toggle:hover {
+            background: var(--surface-light);
+            color: var(--text-primary);
+        }
+
+        .chat-title h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .status-indicator i {
+            font-size: 0.6rem;
+            color: var(--success);
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            scroll-behavior: smooth;
+        }
+
+        .welcome-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+        }
+
+        .welcome-content {
+            max-width: 600px;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .welcome-icon {
+            font-size: 4rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .welcome-content h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .welcome-content p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            transition: var(--transition);
+        }
+
+        .feature:hover {
+            background: var(--surface-light);
+            transform: translateY(-2px);
+        }
+
+        .feature i {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .feature span {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .message {
+            margin-bottom: 1.5rem;
+            animation: messageSlideIn 0.3s ease;
+        }
+
+        .message-content {
+            max-width: 80%;
+            padding: 1rem 1.25rem;
+            border-radius: var(--radius-lg);
+            line-height: 1.6;
+            position: relative;
+        }
+
+        .message.user {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .message.user .message-content {
+            background: var(--primary);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.ai {
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .message.ai .message-content {
+            background: var(--surface);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.ai .message-content pre {
+            background: var(--background);
+            padding: 1rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            margin: 0.5rem 0;
+            overflow-x: auto;
+        }
+
+        .message.ai .message-content code {
+            background: var(--background);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        .input-area {
+            padding: 1rem 1.5rem 1.5rem;
+            background: var(--background);
+            border-top: 1px solid var(--border);
+        }
+
+        .input-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 0.75rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 0.75rem 1rem;
+            transition: var(--transition);
+        }
+
+        .input-container:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(16, 163, 127, 0.1);
+        }
+
+        .input-container textarea {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-primary);
+            font-size: 1rem;
+            line-height: 1.5;
+            resize: none;
+            min-height: 24px;
+            max-height: 200px;
+            font-family: inherit;
+        }
+
+        .input-container textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        .send-btn {
+            background: var(--primary);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+
+        .send-btn:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .send-btn:disabled {
+            background: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .input-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            gap: 0.75rem;
+            margin: 1rem 0;
+            padding: 1rem 1.25rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            border-bottom-left-radius: 4px;
+            max-width: 80%;
+            animation: messageSlideIn 0.3s ease;
+        }
+
+        .typing-indicator.active {
+            display: flex;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius);
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow-lg);
+            z-index: 1001;
+            animation: slideIn 0.3s ease;
+        }
+
+        .notification.show {
+            display: flex;
+        }
+
+        .notification.error {
+            background: var(--error);
+        }
+
+        .notification.warning {
+            background: var(--warning);
+        }
+
+        .verification-notice {
+            background: var(--warning);
+            color: white;
+            padding: 0.75rem;
+            border-radius: var(--radius);
+            margin: 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .verification-notice button {
+            background: white;
+            color: var(--warning);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes messageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.4;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                height: 100vh;
+                z-index: 200;
+                transition: left 0.3s ease;
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .chat-container {
+                width: 100vw;
+            }
+
+            .main-chat {
+                width: 100%;
+            }
+
+            .message-content {
+                max-width: 90%;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .welcome-content h1 {
+                font-size: 1.5rem;
+            }
+
+            .input-area {
+                padding: 1rem;
+            }
+
+            .chat-header {
+                padding: 1rem;
+            }
+
+            .chat-title h2 {
+                font-size: 1rem;
+            }
+
+            .theme-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 0.9rem;
+            }
+
+            .theme-dropdown {
+                right: -1rem;
+            }
+
+            .auth-content {
+                width: 100%;
+                height: 100vh;
+                border-radius: 0;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--surface);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--border-light);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+<!-- Authentication Screen -->
+<div id="authContainer" class="auth-container">
+    <div class="auth-content">
+        <div class="app-title">Mind Mate</div>
+        <div class="content-wrapper">
+            <div class="copy-section">
+                <h2 id="authTitle">Create an account</h2>
+                <p id="authSubtitle">Enter your email to sign up for this app</p>
+            </div>
+            <div class="input-button-section">
+                <input type="email" id="emailInput" class="input-field" placeholder="email@domain.com">
+                <input type="password" id="passwordInput" class="input-field" placeholder="Password (min 6 characters)">
+                <button id="continueBtn" class="continue-btn">Sign Up</button>
+                <button id="forgotPasswordBtn" class="forgot-password-link" style="display: none;">Forgot Password?</button>
+            </div>
+            <div class="welcome-text">Welcome, by AI</div>
+            <div style="margin-top: 16px; text-align: center;">
+                <span style="color: #828282; font-size: 12px;">Already have an account? </span>
+                <button id="toggleAuthMode" style="background: none; border: none; color: var(--primary); font-size: 12px; cursor: pointer; text-decoration: underline;">Sign in</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Password Reset Modal -->
+<div id="passwordResetModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3 class="modal-title">Reset Password</h3>
+        <p class="modal-description">Enter your email address and we'll send you a verification code to reset your password.</p>
+        <input type="email" id="resetEmailInput" class="modal-input" placeholder="Enter your email">
+        <div class="modal-buttons">
+            <button id="sendResetCodeBtn" class="modal-btn primary">Send Code</button>
+            <button id="cancelResetBtn" class="modal-btn secondary">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Verification Code Modal -->
+<div id="verificationCodeModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3 class="modal-title">Enter Verification Code</h3>
+        <p class="modal-description">We've sent a 6-digit verification code to your email. Enter it below.</p>
+        <input type="text" id="verificationCodeInput" class="modal-input" placeholder="Enter 6-digit code" maxlength="6">
+        <input type="password" id="newPasswordInput" class="modal-input" placeholder="Enter new password" style="margin-top: 0.5rem;">
+        <div class="modal-buttons">
+            <button id="verifyCodeBtn" class="modal-btn primary">Reset Password</button>
+            <button id="cancelVerificationBtn" class="modal-btn secondary">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Profile Modal -->
+<div id="profileModal" class="modal-overlay profile-modal">
+    <div class="modal-content">
+        <div class="profile-header">
+            <div class="profile-avatar" id="profileAvatar">
+                <!-- Avatar will be populated by JavaScript -->
+            </div>
+            <div class="profile-info">
+                <h3 id="profileName">User Name</h3>
+                <p id="profileEmailDisplay">user@example.com</p>
+            </div>
+        </div>
+
+        <div class="profile-section">
+            <h4>Account Information</h4>
+            <div class="profile-detail">
+                <span class="profile-label">Display Name</span>
+                <span class="profile-value" id="profileDisplayName">-</span>
+            </div>
+            <div class="profile-detail">
+                <span class="profile-label">Email</span>
+                <span class="profile-value" id="profileEmail">-</span>
+            </div>
+            <div class="profile-detail">
+                <span class="profile-label">Email Verified</span>
+                <span class="profile-value" id="profileEmailVerified">-</span>
+            </div>
+            <div class="profile-detail">
+                <span class="profile-label">Account Created</span>
+                <span class="profile-value" id="profileCreationTime">-</span>
+            </div>
+            <div class="profile-detail">
+                <span class="profile-label">Last Sign In</span>
+                <span class="profile-value" id="profileLastSignIn">-</span>
+            </div>
+            <div class="profile-detail">
+                <span class="profile-label">Provider</span>
+                <span class="profile-value" id="profileProvider">-</span>
+            </div>
+            <div class="profile-detail">
+                <span class="profile-label">Password</span>
+                <button id="changePasswordBtn" class="change-password-btn">Change Password</button>
+            </div>
+        </div>
+
+        <div class="modal-buttons">
+            <button id="closeProfileBtn" class="modal-btn secondary">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- Main Chat Interface -->
+<div class="chat-container" id="chatContainer">
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div id="userInfo" class="user-info">
+                <div id="userAvatar" class="user-avatar">
+                    <!-- Avatar will be populated by JavaScript -->
+                </div>
+                <div class="user-details">
+                    <div id="userName" class="user-name">User Name</div>
+                    <div id="userEmail" class="user-email">user@example.com</div>
+                </div>
+                <button id="profileBtn" class="profile-btn" title="View Profile">
+                    <i class="fas fa-user-cog"></i>
+                </button>
+            </div>
+            <button class="new-chat-btn" id="newChatBtn">
+                <i class="fas fa-plus"></i>
+                New chat
+            </button>
+        </div>
+
+        <div class="model-section">
+            <div class="section-title">
+                <i class="fas fa-brain"></i>
+                AI Model
+            </div>
+            <div class="model-selector">
+                <select id="modelSelect">
+                    <option value="">Loading models...</option>
+                </select>
+                <div class="model-info" id="modelInfo">
+                    <span class="model-price">Select a model</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <div class="section-title">
+                <i class="fas fa-sliders-h"></i>
+                Settings
+            </div>
+
+            <div class="setting-item">
+                <label>Temperature <span id="tempValue">0.7</span></label>
+                <input type="range" id="temperature" min="0" max="2" step="0.1" value="0.7">
+            </div>
+
+            <div class="setting-item">
+                <label>Max tokens</label>
+                <input type="number" id="maxTokens" min="1" max="8192" value="2048" class="number-input">
+            </div>
+
+            <div class="setting-item">
+                <label>OpenRouter API Key</label>
+                <input type="password" id="apiKeyInput" class="number-input" placeholder="sk-or-v1-...">
+                <button id="saveApiKeyBtn" class="continue-btn" style="height: 32px; margin-top: 0.5rem;">Save Key</button>
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <button class="logout-btn" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <div class="main-chat">
+        <div class="chat-header">
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="chat-title">
+                <h2 id="selectedModelName">Mind Mate AI</h2>
+                <div class="status-indicator" id="statusIndicator">
+                    <i class="fas fa-circle"></i>
+                    <span id="statusText">Ready</span>
+                </div>
+            </div>
+            <div class="header-controls">
+                <div class="theme-selector">
+                    <button class="theme-btn" id="themeToggle" title="Toggle theme">
+                        <i class="fas fa-sun"></i>
+                    </button>
+                    <div class="theme-dropdown" id="themeDropdown">
+                        <div class="theme-option" data-theme="light">
+                            <i class="fas fa-sun"></i>
+                            <span>Light</span>
+                        </div>
+                        <div class="theme-option" data-theme="dark">
+                            <i class="fas fa-moon"></i>
+                            <span>Dark</span>
+                        </div>
+                        <div class="theme-option" data-theme="system">
+                            <i class="fas fa-desktop"></i>
+                            <span>System</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="verificationNotice" class="verification-notice hidden">
+            <div>Please verify your email address to access all features.</div>
+            <button id="resendVerificationBtn">Resend verification email</button>
+        </div>
+
+        <div class="messages-container" id="messagesContainer">
+            <div class="welcome-screen" id="welcomeScreen">
+                <div class="welcome-content">
+                    <div class="welcome-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h1>Welcome to Mind Mate AI</h1>
+                    <p>Choose an AI model and start your conversation</p>
+                    <div class="features-grid">
+                        <div class="feature">
+                            <i class="fas fa-brain"></i>
+                            <span>Multiple AI Models</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-bolt"></i>
+                            <span>Real-time Responses</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Secure & Private</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-cog"></i>
+                            <span>Professional Profile</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <div class="input-container">
+                    <textarea
+                            id="messageInput"
+                            placeholder="Message Mind Mate AI..."
+                            rows="1"
+                            maxlength="4000"
+                    ></textarea>
+                <button id="sendBtn" class="send-btn" disabled>
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+            <div class="input-footer">
+                <span class="char-count" id="charCount">0/4000</span>
+                <span class="powered-by">Powered by OpenRouter & Firebase</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="typing-indicator" id="typingIndicator">
+    <div class="typing-dots">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+    </div>
+    <span>AI is thinking...</span>
+</div>
+
+<div class="notification" id="notification">
+    <i class="fas fa-check-circle"></i>
+    <span id="notificationText"></span>
+</div>
+
+<!-- Firebase SDKs -->
+<script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+    import {
+        getAuth,
+        createUserWithEmailAndPassword,
+        signInWithEmailAndPassword,
+        signInWithPopup,
+        GoogleAuthProvider,
+        signOut,
+        sendEmailVerification,
+        sendPasswordResetEmail,
+        confirmPasswordReset,
+        updatePassword,
+        reauthenticateWithCredential,
+        EmailAuthProvider,
+        onAuthStateChanged
+    } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+
+    // Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyBC_JgpNLndWyah5TWgMfnyuDinWw-D9Q8",
+        authDomain: "mind-mate-ai.firebaseapp.com",
+        projectId: "mind-mate-ai",
+        storageBucket: "mind-mate-ai.firebasestorage.app",
+        messagingSenderId: "577407686641",
+        appId: "1:577407686641:web:d048d208596d9490ba1650",
+        measurementId: "G-E7C56JEL5N"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const googleProvider = new GoogleAuthProvider();
+
+    class MindMateAI {
+        constructor() {
+            this.currentUser = null;
+            this.selectedModel = '';
+            this.models = [];
+            this.conversation = [];
+            this.isTyping = false;
+            this.currentTheme = localStorage.getItem('mindmate_theme') || 'system';
+            this.isSignUp = true;
+            this.apiKey = localStorage.getItem('openrouter_api_key') || '';
+            this.pendingPasswordReset = null;
+
+            this.init();
+        }
+
+        init() {
+            this.setupTheme();
+            this.setupEventListeners();
+            this.setupTextareaAutoResize();
+            this.setupAuthStateListener();
+            this.loadApiKey();
+        }
+
+        loadApiKey() {
+            if (this.apiKey) {
+                document.getElementById('apiKeyInput').value = this.apiKey;
+            }
+        }
+
+        setupAuthStateListener() {
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    this.currentUser = user;
+                    this.showChatInterface();
+                    this.updateUserInfo();
+                    if (this.apiKey) {
+                        this.loadModels();
+                    }
+                } else {
+                    this.currentUser = null;
+                    this.showAuthInterface();
+                }
+            });
+        }
+
+        showAuthInterface() {
+            document.getElementById('authContainer').classList.remove('hidden');
+            document.getElementById('chatContainer').classList.add('hidden');
+        }
+
+        showChatInterface() {
+            document.getElementById('authContainer').classList.add('hidden');
+            document.getElementById('chatContainer').classList.remove('hidden');
+            document.getElementById('chatContainer').style.display = 'flex';
+        }
+
+        updateUserInfo() {
+            if (!this.currentUser) return;
+
+            const userName = document.getElementById('userName');
+            const userEmail = document.getElementById('userEmail');
+            const userAvatar = document.getElementById('userAvatar');
+
+            const displayName = this.currentUser.displayName || this.currentUser.email.split('@')[0];
+            const email = this.currentUser.email;
+
+            userName.textContent = displayName;
+            userEmail.textContent = email;
+
+            // Set avatar
+            if (this.currentUser.photoURL) {
+                userAvatar.innerHTML = `<img src="${this.currentUser.photoURL}" alt="Profile">`;
+            } else {
+                userAvatar.innerHTML = displayName.charAt(0).toUpperCase();
+            }
+        }
+
+        checkEmailVerification() {
+            // No-op: verification not required
+        }
+
+        setupEventListeners() {
+            // Auth events
+            document.getElementById('continueBtn').addEventListener('click', () => this.handleAuth());
+            document.getElementById('toggleAuthMode').addEventListener('click', () => this.toggleAuthMode());
+            document.getElementById('forgotPasswordBtn').addEventListener('click', () => this.showPasswordResetModal());
+            document.getElementById('logoutBtn').addEventListener('click', () => this.logout());
+            document.getElementById('resendVerificationBtn').addEventListener('click', () => this.resendVerification());
+
+            // Profile events
+            document.getElementById('profileBtn').addEventListener('click', () => this.showProfileModal());
+            document.getElementById('userInfo').addEventListener('click', () => this.showProfileModal());
+            document.getElementById('closeProfileBtn').addEventListener('click', () => this.hideProfileModal());
+            document.getElementById('changePasswordBtn').addEventListener('click', () => this.initiatePasswordChange());
+
+            // Password reset events
+            document.getElementById('sendResetCodeBtn').addEventListener('click', () => this.sendPasswordResetCode());
+            document.getElementById('cancelResetBtn').addEventListener('click', () => this.hidePasswordResetModal());
+            document.getElementById('verifyCodeBtn').addEventListener('click', () => this.verifyAndResetPassword());
+            document.getElementById('cancelVerificationBtn').addEventListener('click', () => this.hideVerificationModal());
+
+            // API Key events
+            document.getElementById('saveApiKeyBtn').addEventListener('click', () => this.saveApiKey());
+
+            // Enter key for auth
+            document.getElementById('emailInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') this.handleAuth();
+            });
+            document.getElementById('passwordInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') this.handleAuth();
+            });
+
+            // Model selection
+            document.getElementById('modelSelect').addEventListener('change', (e) => this.selectModel(e.target.value));
+
+            // Settings
+            document.getElementById('temperature').addEventListener('input', (e) => {
+                document.getElementById('tempValue').textContent = e.target.value;
+            });
+
+            // Chat functionality
+            document.getElementById('sendBtn').addEventListener('click', () => this.sendMessage());
+            document.getElementById('messageInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    this.sendMessage();
+                }
+            });
+
+            // Character count
+            document.getElementById('messageInput').addEventListener('input', (e) => {
+                const count = e.target.value.length;
+                document.getElementById('charCount').textContent = `${count}/4000`;
+            });
+
+            // New chat
+            document.getElementById('newChatBtn').addEventListener('click', () => this.startNewChat());
+
+            // Sidebar toggle for mobile
+            document.getElementById('sidebarToggle').addEventListener('click', () => this.toggleSidebar());
+
+            // Theme controls
+            document.getElementById('themeToggle').addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.toggleThemeDropdown();
+            });
+
+            // Theme selection
+            document.querySelectorAll('.theme-option').forEach(option => {
+                option.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const theme = option.dataset.theme;
+                    this.setTheme(theme);
+                    this.hideThemeDropdown();
+                });
+            });
+
+            // Close modals when clicking outside
+            document.addEventListener('click', (e) => {
+                const sidebar = document.getElementById('sidebar');
+                const toggle = document.getElementById('sidebarToggle');
+                const themeDropdown = document.getElementById('themeDropdown');
+                const themeToggle = document.getElementById('themeToggle');
+
+                if (window.innerWidth <= 768 &&
+                    !sidebar.contains(e.target) &&
+                    !toggle.contains(e.target) &&
+                    sidebar.classList.contains('open')) {
+                    this.closeSidebar();
+                }
+
+                if (!themeDropdown.contains(e.target) &&
+                    !themeToggle.contains(e.target) &&
+                    themeDropdown.classList.contains('active')) {
+                    this.hideThemeDropdown();
+                }
+            });
+        }
+
+        saveApiKey() {
+            const apiKey = document.getElementById('apiKeyInput').value.trim();
+            if (!apiKey) {
+                this.showNotification('Please enter a valid API key', 'error');
+                return;
+            }
+
+            if (!apiKey.startsWith('sk-or-v1-')) {
+                this.showNotification('Please enter a valid OpenRouter API key', 'error');
+                return;
+            }
+
+            this.apiKey = apiKey;
+            localStorage.setItem('openrouter_api_key', apiKey);
+            this.showNotification('API key saved successfully!', 'success');
+            this.loadModels();
+        }
+
+        toggleAuthMode() {
+            this.isSignUp = !this.isSignUp;
+            const authTitle = document.getElementById('authTitle');
+            const authSubtitle = document.getElementById('authSubtitle');
+            const passwordInput = document.getElementById('passwordInput');
+            const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
+            const toggleBtn = document.getElementById('toggleAuthMode');
+            const continueBtn = document.getElementById('continueBtn');
+
+            if (this.isSignUp) {
+                authTitle.textContent = 'Create an account';
+                authSubtitle.textContent = 'Enter your email and password to sign up for this app';
+                passwordInput.style.display = 'block';
+                forgotPasswordBtn.style.display = 'none';
+                toggleBtn.textContent = 'Sign in';
+                continueBtn.textContent = 'Sign Up';
+            } else {
+                authTitle.textContent = 'Welcome back';
+                authSubtitle.textContent = 'Enter your email and password to sign in';
+                passwordInput.style.display = 'block';
+                forgotPasswordBtn.style.display = 'block';
+                toggleBtn.textContent = 'Sign up';
+                continueBtn.textContent = 'Sign In';
+            }
+        }
+
+        async handleAuth() {
+            const email = document.getElementById('emailInput').value.trim();
+            const password = document.getElementById('passwordInput').value;
+
+            if (!email) {
+                this.showNotification('Please enter your email', 'error');
+                return;
+            }
+
+            if (this.isSignUp) {
+                if (!password) {
+                    // Show password field for sign up
+                    document.getElementById('passwordInput').style.display = 'block';
+                    document.getElementById('passwordInput').focus();
+                    document.getElementById('continueBtn').textContent = 'Create Account';
+                    return;
+                }
+                await this.signUpWithEmail(email, password);
+            } else {
+                if (!password) {
+                    this.showNotification('Please enter your password', 'error');
+                    return;
+                }
+                await this.signInWithEmail(email, password);
+            }
+        }
+
+        async signUpWithEmail(email, password) {
+            if (password.length < 6) {
+                this.showNotification('Password must be at least 6 characters', 'error');
+                return;
+            }
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                this.showNotification('Account created! You can now use the app.', 'success');
+            } catch (error) {
+                console.error('Sign up error:', error);
+                this.showNotification(this.getAuthErrorMessage(error.code), 'error');
+            }
+        }
+
+        async signInWithEmail(email, password) {
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                this.showNotification('Welcome back!', 'success');
+            } catch (error) {
+                console.error('Sign in error:', error);
+                this.showNotification(this.getAuthErrorMessage(error.code), 'error');
+            }
+        }
+
+        async logout() {
+            try {
+                await signOut(auth);
+                this.showNotification('Logged out successfully', 'success');
+            } catch (error) {
+                console.error('Logout error:', error);
+                this.showNotification('Failed to logout', 'error');
+            }
+        }
+
+        async resendVerification() {
+            // No-op: verification not required
+        }
+
+        showPasswordResetModal() {
+            document.getElementById('passwordResetModal').classList.add('active');
+        }
+
+        hidePasswordResetModal() {
+            document.getElementById('passwordResetModal').classList.remove('active');
+            document.getElementById('resetEmailInput').value = '';
+        }
+
+        showVerificationModal() {
+            document.getElementById('verificationCodeModal').classList.add('active');
+        }
+
+        hideVerificationModal() {
+            document.getElementById('verificationCodeModal').classList.remove('active');
+            document.getElementById('verificationCodeInput').value = '';
+            document.getElementById('newPasswordInput').value = '';
+        }
+
+        showProfileModal() {
+            if (!this.currentUser) return;
+
+            // Populate profile information
+            const profileAvatar = document.getElementById('profileAvatar');
+            const profileName = document.getElementById('profileName');
+            const profileEmailDisplay = document.getElementById('profileEmailDisplay');
+            const profileDisplayName = document.getElementById('profileDisplayName');
+            const profileEmail = document.getElementById('profileEmail');
+            const profileEmailVerified = document.getElementById('profileEmailVerified');
+            const profileCreationTime = document.getElementById('profileCreationTime');
+            const profileLastSignIn = document.getElementById('profileLastSignIn');
+            const profileProvider = document.getElementById('profileProvider');
+
+            const displayName = this.currentUser.displayName || this.currentUser.email.split('@')[0];
+
+            // Set avatar
+            if (this.currentUser.photoURL) {
+                profileAvatar.innerHTML = `<img src="${this.currentUser.photoURL}" alt="Profile">`;
+            } else {
+                profileAvatar.innerHTML = displayName.charAt(0).toUpperCase();
+            }
+
+            profileName.textContent = displayName;
+            profileEmailDisplay.textContent = this.currentUser.email;
+            profileDisplayName.textContent = this.currentUser.displayName || 'Not set';
+            profileEmail.textContent = this.currentUser.email;
+            profileEmailVerified.textContent = this.currentUser.emailVerified ? 'Yes' : 'No';
+            profileCreationTime.textContent = new Date(this.currentUser.metadata.creationTime).toLocaleDateString();
+            profileLastSignIn.textContent = new Date(this.currentUser.metadata.lastSignInTime).toLocaleDateString();
+
+            const provider = this.currentUser.providerData[0]?.providerId || 'email';
+            profileProvider.textContent = provider === 'google.com' ? 'Google' : 'Email';
+
+            document.getElementById('profileModal').classList.add('active');
+        }
+
+        hideProfileModal() {
+            document.getElementById('profileModal').classList.remove('active');
+        }
+
+        async sendPasswordResetCode() {
+            const email = document.getElementById('resetEmailInput').value.trim();
+
+            if (!email) {
+                this.showNotification('Please enter your email address', 'error');
+                return;
+            }
+
+            try {
+                // For demo purposes, we'll simulate sending a code
+                // In a real app, you'd use Firebase Functions or a backend service
+                this.pendingPasswordReset = {
+                    email: email,
+                    code: Math.floor(100000 + Math.random() * 900000).toString() // 6-digit code
+                };
+
+                console.log('Reset code (demo):', this.pendingPasswordReset.code);
+                this.showNotification(`Reset code sent to ${email} (Check console for demo code)`, 'success');
+
+                this.hidePasswordResetModal();
+                this.showVerificationModal();
+            } catch (error) {
+                console.error('Password reset error:', error);
+                this.showNotification('Failed to send reset code', 'error');
+            }
+        }
+
+        async verifyAndResetPassword() {
+            const code = document.getElementById('verificationCodeInput').value.trim();
+            const newPassword = document.getElementById('newPasswordInput').value;
+
+            if (!code || !newPassword) {
+                this.showNotification('Please enter both verification code and new password', 'error');
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                this.showNotification('Password must be at least 6 characters', 'error');
+                return;
+            }
+
+            if (!this.pendingPasswordReset || code !== this.pendingPasswordReset.code) {
+                this.showNotification('Invalid verification code', 'error');
+                return;
+            }
+
+            try {
+                // For demo purposes, we'll update the current user's password
+                // In a real app, you'd verify the code server-side
+                if (this.currentUser) {
+                    await updatePassword(this.currentUser, newPassword);
+                    this.showNotification('Password updated successfully!', 'success');
+                } else {
+                    this.showNotification('Password reset link sent to email', 'success');
+                }
+
+                this.hideVerificationModal();
+                this.pendingPasswordReset = null;
+            } catch (error) {
+                console.error('Password reset error:', error);
+                this.showNotification('Failed to reset password', 'error');
+            }
+        }
+
+        async initiatePasswordChange() {
+            if (!this.currentUser) return;
+
+            const provider = this.currentUser.providerData[0]?.providerId;
+            if (provider === 'google.com') {
+                this.showNotification('Google users cannot change password here. Please use Google account settings.', 'warning');
+                return;
+            }
+
+            this.hideProfileModal();
+            this.showPasswordResetModal();
+            document.getElementById('resetEmailInput').value = this.currentUser.email;
+        }
+
+        getAuthErrorMessage(errorCode) {
+            switch (errorCode) {
+                case 'auth/email-already-in-use':
+                    return 'This email is already registered. Try signing in instead.';
+                case 'auth/invalid-email':
+                    return 'Please enter a valid email address.';
+                case 'auth/operation-not-allowed':
+                    return 'Email/password accounts are not enabled.';
+                case 'auth/weak-password':
+                    return 'Please choose a stronger password.';
+                case 'auth/user-disabled':
+                    return 'This account has been disabled.';
+                case 'auth/user-not-found':
+                    return 'No account found with this email.';
+                case 'auth/wrong-password':
+                    return 'Incorrect password.';
+                case 'auth/invalid-credential':
+                    return 'Invalid email or password.';
+                default:
+                    return 'An error occurred. Please try again.';
+            }
+        }
+
+        setupTextareaAutoResize() {
+            const textarea = document.getElementById('messageInput');
+
+            textarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+            });
+        }
+
+        async loadModels() {
+            if (!this.apiKey) {
+                this.showNotification('Please set up your OpenRouter API key in settings', 'warning');
+                return;
+            }
+
+            try {
+                const response = await fetch('https://openrouter.ai/api/v1/models', {
+                    headers: {
+                        'Authorization': `Bearer ${this.apiKey}`,
+                        'HTTP-Referer': window.location.href,
+                        'X-Title': 'Mind Mate AI Chat'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                this.models = data.data || [];
+                this.populateModelSelect();
+
+            } catch (error) {
+                console.error('Error loading models:', error);
+                this.showNotification('Failed to load AI models. Please check your API key.', 'error');
+            }
+        }
+
+        populateModelSelect() {
+            const select = document.getElementById('modelSelect');
+            select.innerHTML = '<option value="">Choose a model...</option>';
+
+            const providers = {};
+            this.models.forEach(model => {
+                const provider = model.id.split('/')[0];
+                if (!providers[provider]) {
+                    providers[provider] = [];
+                }
+                providers[provider].push(model);
+            });
+
+            Object.keys(providers).sort().forEach(provider => {
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = this.formatProviderName(provider);
+
+                providers[provider]
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .forEach(model => {
+                        const option = document.createElement('option');
+                        option.value = model.id;
+                        option.textContent = model.name;
+                        option.dataset.pricing = model.pricing?.prompt || '0';
+                        optgroup.appendChild(option);
+                    });
+
+                select.appendChild(optgroup);
+            });
+        }
+
+        formatProviderName(provider) {
+            const names = {
+                'openai': 'OpenAI',
+                'anthropic': 'Anthropic',
+                'google': 'Google',
+                'meta-llama': 'Meta Llama',
+                'mistralai': 'Mistral AI',
+                'cohere': 'Cohere'
+            };
+            return names[provider] || provider.charAt(0).toUpperCase() + provider.slice(1);
+        }
+
+        selectModel(modelId) {
+            this.selectedModel = modelId;
+            const model = this.models.find(m => m.id === modelId);
+
+            if (model) {
+                document.getElementById('selectedModelName').textContent = model.name;
+                document.getElementById('sendBtn').disabled = false;
+
+                const pricing = model.pricing?.prompt || '0';
+                document.getElementById('modelInfo').innerHTML =
+                    `<span class="model-price">$${pricing}/1K tokens</span>`;
+
+                this.hideWelcomeScreen();
+            } else {
+                document.getElementById('selectedModelName').textContent = 'Mind Mate AI';
+                document.getElementById('sendBtn').disabled = true;
+                document.getElementById('modelInfo').innerHTML =
+                    '<span class="model-price">Select a model</span>';
+            }
+        }
+
+        hideWelcomeScreen() {
+            const welcomeScreen = document.getElementById('welcomeScreen');
+            if (welcomeScreen) {
+                welcomeScreen.style.display = 'none';
+            }
+        }
+
+        async sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+
+            if (!message || !this.selectedModel || this.isTyping) return;
+
+            if (!this.apiKey) {
+                this.showNotification('Please set up your OpenRouter API key', 'error');
+                return;
+            }
+
+            this.addMessage('user', message);
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+            document.getElementById('charCount').textContent = '0/4000';
+
+            this.showTypingIndicator();
+
+            const temperature = parseFloat(document.getElementById('temperature').value);
+            const maxTokens = parseInt(document.getElementById('maxTokens').value);
+
+            this.conversation.push({ role: 'user', content: message });
+
+            try {
+                this.isTyping = true;
+                this.updateStatus('AI is thinking...', 'loading');
+
+                const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${this.apiKey}`,
+                        'Content-Type': 'application/json',
+                        'HTTP-Referer': window.location.href,
+                        'X-Title': 'Mind Mate AI Chat'
+                    },
+                    body: JSON.stringify({
+                        model: this.selectedModel,
+                        messages: this.conversation,
+                        temperature: temperature,
+                        max_tokens: maxTokens,
+                        stream: false
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error?.message || `HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (!data.choices || !data.choices[0]) {
+                    throw new Error('Invalid response format');
+                }
+
+                const aiMessage = data.choices[0].message.content;
+
+                this.conversation.push({ role: 'assistant', content: aiMessage });
+                this.addMessage('ai', aiMessage);
+
+                this.updateStatus('Ready', 'success');
+
+            } catch (error) {
+                console.error('Error sending message:', error);
+                this.showNotification(`Error: ${error.message}`, 'error');
+                this.addMessage('ai', 'Sorry, I encountered an error processing your request. Please try again.');
+                this.updateStatus('Error occurred', 'error');
+
+                this.conversation.pop();
+            } finally {
+                this.hideTypingIndicator();
+                this.isTyping = false;
+            }
+        }
+
+        addMessage(role, content) {
+            const messagesContainer = document.getElementById('messagesContainer');
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}`;
+
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            messageContent.innerHTML = this.formatMessage(content);
+
+            messageDiv.appendChild(messageContent);
+            messagesContainer.appendChild(messageDiv);
+
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        formatMessage(content) {
+            let formatted = content
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/`([^`\n]+)`/g, '<code>$1</code>')
+                .replace(/\n/g, '<br>');
+
+            formatted = formatted.replace(/```(\w+)?\n?([\s\S]*?)```/g,
+                '<pre><code>$2</code></pre>');
+
+            return formatted;
+        }
+
+        showTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            const messagesContainer = document.getElementById('messagesContainer');
+
+            indicator.classList.add('active');
+            messagesContainer.appendChild(indicator);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        hideTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            indicator.classList.remove('active');
+        }
+
+        startNewChat() {
+            this.conversation = [];
+            const messagesContainer = document.getElementById('messagesContainer');
+
+            const messages = messagesContainer.querySelectorAll('.message');
+            messages.forEach(msg => msg.remove());
+
+            this.hideTypingIndicator();
+
+            this.showNotification('New chat started', 'success');
+        }
+
+        updateStatus(text, type) {
+            const statusText = document.getElementById('statusText');
+            const statusIndicator = document.getElementById('statusIndicator').querySelector('i');
+
+            statusText.textContent = text;
+
+            statusIndicator.classList.remove('fa-circle', 'fa-spinner', 'fa-exclamation-triangle');
+
+            switch (type) {
+                case 'success':
+                    statusIndicator.classList.add('fa-circle');
+                    statusIndicator.style.color = 'var(--success)';
+                    break;
+                case 'loading':
+                    statusIndicator.classList.add('fa-spinner', 'fa-spin');
+                    statusIndicator.style.color = 'var(--primary)';
+                    break;
+                case 'error':
+                    statusIndicator.classList.add('fa-exclamation-triangle');
+                    statusIndicator.style.color = 'var(--error)';
+                    break;
+            }
+        }
+
+        showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            const icon = notification.querySelector('i');
+
+            notificationText.textContent = message;
+
+            icon.className = type === 'error' ? 'fas fa-exclamation-circle' :
+                             type === 'warning' ? 'fas fa-exclamation-triangle' : 'fas fa-check-circle';
+            notification.className = `notification ${type === 'error' ? 'error' : type === 'warning' ? 'warning' : ''}`;
+
+            notification.classList.add('show');
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.remove('open');
+        }
+
+        setupTheme() {
+            this.applyTheme(this.currentTheme);
+            this.updateThemeIcon();
+            this.updateThemeSelection();
+
+            if (window.matchMedia) {
+                const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+                mediaQuery.addEventListener('change', () => {
+                    if (this.currentTheme === 'system') {
+                        this.updateThemeIcon();
+                    }
+                });
+            }
+        }
+
+        setTheme(theme) {
+            this.currentTheme = theme;
+            localStorage.setItem('mindmate_theme', theme);
+            this.applyTheme(theme);
+            this.updateThemeIcon();
+            this.updateThemeSelection();
+            this.showNotification(`Theme changed to ${theme}`, 'success');
+        }
+
+        applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+        }
+
+        updateThemeIcon() {
+            const themeToggle = document.getElementById('themeToggle');
+            const icon = themeToggle?.querySelector('i');
+
+            if (!icon) return;
+
+            let iconClass = 'fas fa-desktop';
+
+            if (this.currentTheme === 'light') {
+                iconClass = 'fas fa-sun';
+            } else if (this.currentTheme === 'dark') {
+                iconClass = 'fas fa-moon';
+            } else if (this.currentTheme === 'system') {
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    iconClass = 'fas fa-moon';
+                } else {
+                    iconClass = 'fas fa-sun';
+                }
+            }
+
+            icon.className = iconClass;
+        }
+
+        updateThemeSelection() {
+            document.querySelectorAll('.theme-option').forEach(option => {
+                option.classList.remove('active');
+                if (option.dataset.theme === this.currentTheme) {
+                    option.classList.add('active');
+                }
+            });
+        }
+
+        toggleThemeDropdown() {
+            const dropdown = document.getElementById('themeDropdown');
+            dropdown?.classList.toggle('active');
+        }
+
+        hideThemeDropdown() {
+            const dropdown = document.getElementById('themeDropdown');
+            dropdown?.classList.remove('active');
+        }
+    }
+
+    // Initialize the application
+    document.addEventListener('DOMContentLoaded', () => {
+        new MindMateAI();
+    });
+</script>
+</body>
+</html>
